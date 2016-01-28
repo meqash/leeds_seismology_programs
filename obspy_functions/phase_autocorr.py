@@ -82,3 +82,10 @@ def mktrace(data,station,channel,sampling_rate,npts):
            "npts": npts
           }
     return Trace(data=data,header=stats)
+
+def gen_fname(name,net,chan,year,jul_day):
+    """This function takes trace information including: station name, network,
+    channel, year and julian day. This information is then converted into a
+    useful filename for the trace.
+    """
+    return str(name+"."+net+"."+chan+"."+str(year)+"."+str(jul_day))
