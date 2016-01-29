@@ -24,3 +24,28 @@ def specext(vals,tw):
 	
 	#Returning values for use
 	return valsfft, conjugate, valspow #,phas
+
+
+
+#sleptap trims a trace (in this case a copy of the original trorig), tapers it using a slepian taper (multi taper), and outputs the trace as a numpy array
+#As well as outputting the array as a list (slepwin) for use in specext
+#For this to function, tror must have been imported using obspy, your low time and hitime are the times you want to trim the trace down to
+#slepper and slepwid define the percentage to be tapered of the window you've selected and the bandwidth to be used in the slepian taper
+def sleptap(tror, lowtime, hitime, slepper, slepwid):
+	#First pull out the start time for use in the function
+	start = tror[0].stats.starttime
+	
+	#Copying the trace in order to keep the original version, it is then trimmed to the specified window
+	sleptr = tror.copy().trim(start+(lowtime*0.01), start+(hitime*0.01))
+	
+	#Next we perform the taper using a slepian window, in this case both sides are tapered, but this can easily be changed by adjusting the 
+	#side variable
+	sleptr.taper(max_percentage=slepper,type='slepian',max_length=None,side='both',width=slepwid)
+	
+	#Pulling the trace out into a numpy array
+	sleparr = sleptr[0]
+	#Also outputting the trace in a list form
+	slepwin = sleparr[:].tolist()
+	
+	#Returning values
+	return sleparr, slepwin
