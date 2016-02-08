@@ -31,6 +31,28 @@ def autocorr(trace):
 
     return pac
 
+def crosscorr(tr1,tr2):
+    """This function takes 2 obspy traces and performs a phase crosscorrelation
+    of the traces. First, the hilbert transform is taken to obtain the 
+    analytic signal and hence the instantaneous phase. This is then passed to a 
+    fortran script where phase correlation is performed after Schimmel et al., 2011.
+
+    This function relies on the shared object file phasecorr.so, which is the file
+    containing the fortran subroutine for phase correlation.
+    """
+
+    import numpy as np
+
+    from scipy.signal import hilbert
+    from phasecorr import phasecorr
+    # Hilbert transform to obtain the analytic signal
+    htrans1 = hilbert(tr1)
+    htrans2 = hilbert(tr2)
+    # Perform phase autocorrelation with instantaneous phase
+    pcc = phasecorr(np.angle(htrans1),np.angle(htrans2),len(htrans1))
+
+    return pcc
+
 def stream_stack(st):
     """
     This function takes an obspy stream object containing an arbitrary number of traces 
@@ -65,7 +87,7 @@ def inst_correct(tr,pre_filt,unit):
     return corr_tr
 
 def st_correct(st,pre_filt,unit):
-    """This function corrects a trace from the DANA network for instrument
+    """This function corrects a stream from the DANA network for instrument
        response as read from the correct RESP file. It requires the trace
        object to be corrected, a pre filter (as a Python tuple with 4 entries)
        and a string object stipulating the unit to be corrected to (either
