@@ -64,6 +64,29 @@ def inst_correct(tr,pre_filt,unit):
     os.chdir(curr_dir) # Change back to previous directory
     return corr_tr
 
+def st_correct(st,pre_filt,unit):
+    """This function corrects a trace from the DANA network for instrument
+       response as read from the correct RESP file. It requires the trace
+       object to be corrected, a pre filter (as a Python tuple with 4 entries)
+       and a string object stipulating the unit to be corrected to (either
+       "DIS", "VEL" or "ACC")
+    """
+    import os
+    
+    curr_dir = os.getcwd() # Remember working directory
+
+    resp_dir = "/nfs/a224/DANA/DATALESS/RESPS" # Directory containing RESPS
+    os.chdir(resp_dir)
+    for tr in st:
+        respf = "RESP.YH."+tr.stats.station+".."+tr.stats.channel
+        seedresp = {"filename": respf,
+                     "units": unit
+                    }
+
+        tr.simulate(paz_remove=None, pre_filt=pre_filt, seedresp=seedresp)
+    os.chdir(curr_dir) # Change back to previous directory
+    return st
+
 def mktrace(data,station,channel,sampling_rate,npts):
     """This function creates a new obspy trace object given the array containing
        trace data and important meta data.
