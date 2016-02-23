@@ -63,6 +63,20 @@ def stream_stack(st):
 
     return (np.sum([tr.data for tr in st], axis=0))/len(st)
 
+def std_stack(st):
+    """
+    This function takes an obspy stream object containing an arbitrary number of traces
+    and lineraly stacks all of the traces, and will also compute the standard deviation
+    of the stack, returning both of these values
+    """
+
+    import numpy as np
+
+    stack = (np.sum([tr.data for tr in st], axis=0))/len(st)
+    std_dev = np.std([tr.data for tr in st], axis=0)
+
+    return stack, std_dev
+
 def inst_correct(tr,pre_filt,unit):
     """This function corrects a trace from the DANA network for instrument
        response as read from the correct RESP file. It requires the trace
